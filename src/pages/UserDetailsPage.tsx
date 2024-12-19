@@ -1,38 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-type User= {
-  name: { first: string; last: string };
-  email: string;
-  phone: string;
-  location: { city: string; country: string };
-  picture: { large: string };
-}
-
-const UserDetailsPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("https://randomuser.me/api/?uuid=" + id)
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data.results[0]);
-        setLoading(false);
-      });
-  }, [id]);
-
-  if (loading) {
-    return <p>Loading user details...</p>;
+type User = {
+    login: { uuid: string };
+    name: { first: string; last: string };
+    email: string;
+    phone: string;
+    location: { city: string; country: string };
+    picture: { large: string };
+  };
+  
+  type UserDetailsPageProps = {
+    users: User[]; 
   }
+  
 
-  if (!user) {
-    return <p>User not found!</p>;
-  }
+const UserDetailsPage = ({users}:UserDetailsPageProps) => {
+    const { id } = useParams<{ id: string }>();
+    const user = users.find((u) => u.login.uuid === id);
+  
+    if (!user) {
+      return <p>Felhasználó nem található!</p>;
+    }
+
 
   return (
-    <div>
+    <div className="user-details">
       <h1>{user.name.first} {user.name.last}</h1>
       <img src={user.picture.large} alt="User profile" />
       <p>Email: {user.email}</p>
